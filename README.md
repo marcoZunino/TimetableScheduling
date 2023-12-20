@@ -3,12 +3,20 @@
 ## 1er alcance:
   - 1 unico grupo y año: no hay materias simultáneas
   - profesores fijados para cada materia
-  - bloques horarios fijos
+  - bloques horarios fijos, 1 solo turno
 
 ## 2do alcance:
   - varios grupos
-  - mismo profesor para una misma materia en distintos grupos
+  - asignacion de profesores a materias
 
 ## 3er alcance:
-  - asignacion de profesores a materias
+  - varios turnos de horarios
+
+## 4to alcance:
+  - materias electivas, maximizar disponibilidad con respecto a otras materias
+
+## 5to alcance:
+  - horarios excepcionales: se penaliza pero evita casos no factibles
+
+
 
