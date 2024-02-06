@@ -11,11 +11,10 @@
 
 ## 3er alcance:
   - varios turnos de horarios
-
-## 4to alcance:
+  - varios años con varios grupos cada uno
   - materias electivas, maximizar disponibilidad con respecto a otras materias
 
-## 5to alcance:
+## 4to alcance:
   - horarios excepcionales: se penaliza pero evita casos no factibles
 
 
