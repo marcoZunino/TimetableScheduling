@@ -27,7 +27,7 @@ class Horario:
         return type(__value) == type(self) and self.inicio == __value.inicio and self.fin == __value.fin
 
 class Grupo:
-    def __init__(self, id: int, anio: int=None, turno: str=None, carrera: str=None, particion: int=None, recurse: bool=False, aux=None) -> None:
+    def __init__(self, id: int, anio: int=None, turno: str=None, carrera: str=None, particion: int=None, recurse: bool=False, aux: bool=False) -> None:
         self.id = id
         self.anio = anio
         self.turno = turno
@@ -43,7 +43,7 @@ class Grupo:
         st += str(self.carrera) if self.carrera is not None else ""
         st += "REC" if self.recurse else ""
         st += str(self.particion) if self.particion is not None else ""
-        st += str(self.aux) if self.aux is not None else ""
+        st += "aux" if self.aux else ""
         # st += str(self.turno) if self.turno is not None else ""
         return st
 
@@ -65,12 +65,13 @@ class BloqueHorario:
         return (self.dia.id, self.horario.id)
 
 class Profesor:
-    def __init__(self, id: int, nombre: str, minimizar_dias: bool = False):
+    def __init__(self, id: int, nombre: str, minimizar_dias: bool = False, nombre_completo: str = None) -> None:
         self.id = id
         self.nombre = nombre
+        self.nombre_completo = nombre_completo
         self.no_disponible = []
         self.prioridades = []
-        self.lista_materias = [] # lista_materias[i] = (nombre_materia: str, max_grupos: int)
+        self.lista_materias = [] # lista_materias[i] = (nombre_materia: str, grupos_max: int)
         self.minimizar_dias = minimizar_dias
 
     def __str__(self) -> str:
@@ -94,6 +95,7 @@ class Materia:
                  grupos = [],
                  profesores = [],
                  cantidad_profesores = 1,
+                 electiva = False,
                  ) -> None:
         
         self.nombre = nombre
@@ -105,6 +107,7 @@ class Materia:
         self.no_disponible = []
         self.prioridades = []
         self.cantidad_profesores = cantidad_profesores
+        self.electiva = electiva
         
     def __str__(self) -> str:
         # if self.grupo is not None:
