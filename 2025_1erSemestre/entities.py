@@ -96,8 +96,9 @@ class Materia:
                  profesores = [],
                  cantidad_profesores = 1,
                  electiva = False,
+                 teo_prac = None
                  ) -> None:
-        
+
         self.nombre = nombre
         self.id = id
         self.carga_horaria = carga_horaria  #C_m
@@ -108,6 +109,7 @@ class Materia:
         self.prioridades = []
         self.cantidad_profesores = cantidad_profesores
         self.electiva = electiva
+        self.teo_prac = teo_prac
         
     def __str__(self) -> str:
         # if self.grupo is not None:
