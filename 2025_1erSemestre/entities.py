@@ -65,14 +65,14 @@ class BloqueHorario:
         return (self.dia.id, self.horario.id)
 
 class Profesor:
-    def __init__(self, id: int, nombre: str, minimizar_dias: bool = False, nombre_completo: str = None) -> None:
+    def __init__(self, id: int, nombre: str, min_max_dias: str = None, nombre_completo: str = None) -> None:
         self.id = id
         self.nombre = nombre
         self.nombre_completo = nombre_completo
         self.no_disponible = []
         self.prioridades = []
         self.lista_materias = [] # lista_materias[i] = (nombre_materia: str, grupos_max: int)
-        self.minimizar_dias = minimizar_dias
+        self.min_max_dias = min_max_dias
 
     def __str__(self) -> str:
         return self.nombre
