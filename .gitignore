@@ -3,3 +3,14 @@
 2025_1erSemestre/output.xlsx
 2025_1erSemestre/iismodel.ilp
 2025_1erSemestre/__pycache__/entities.cpython-310.pyc
+2025_2doSemestre/db_manager/__pycache__/__init__.cpython-310.pyc
+2025_2doSemestre/db_manager/__pycache__/__init__.cpython-312.pyc
+.gitignore
+2025_2doSemestre/db_manager/__pycache__/db_config.cpython-312.pyc
+2025_2doSemestre/__pycache__/entities.cpython-312.pyc
+2025_2doSemestre/__pycache__/load_data.cpython-312.pyc
+2025_2doSemestre/__pycache__/printing.cpython-312.pyc
+2025_2doSemestre/db_manager/__pycache__/db_config.cpython-310.pyc
+2025_2doSemestre/db_manager/__pycache__/read_db.cpython-312.pyc
+2025_2doSemestre/db_manager/__pycache__/write_solution_db.cpython-310.pyc
+2025_2doSemestre/db_manager/__pycache__/write_solution_db.cpython-312.pyc
