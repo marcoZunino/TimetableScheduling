@@ -2,7 +2,8 @@ from entities import *
 import random
 import pandas as pd
 
-# cargar datos
+# funciones para cargar datos en entidades
+
 """
 This module provides functions to manage and manipulate data related to 'materias', 'grupos', and 'profesores'.
 
@@ -10,7 +11,7 @@ Functions:
     add_materia(materias, id, nombre, carga_horaria, cantidad_dias, grupos=[], profesores=[], cantidad_profesores=1):
         Adds a new 'materia' to the list of 'materias'.
         
-    add_grupo(grupos, anio, turno, carrera, particion, recurse, aux):
+    add_grupo(grupos, anio, turno, carrera, particion, recurse):
         Adds a new 'grupo' to the list of 'grupos'.
         
     add_profesor(profesores, id, nombre, min_max_dias=None):
@@ -37,11 +38,16 @@ def add_materia(materias, id, nombre, carga_horaria, cantidad_dias, grupos=[], p
     materias.append(Materia(id, nombre, carga_horaria=carga_horaria, cantidad_dias=cantidad_dias,
                             grupos=grupos, profesores=profesores, cantidad_profesores=cantidad_profesores,
                             electiva=electiva, teo_prac=teo_prac))
+    
+
+def add_horario(horarios: list[Horario], inicio, fin, turnos):
+    id = len(horarios)
+    horarios.append(Horario(id, inicio, fin, turnos))
 
 # crear grupo
-def add_grupo(grupos, anio, turno, carrera, particion, recurse, aux):
+def add_grupo(grupos, anio, turno, carrera, particion, recurse):
     id = len(grupos)
-    grupos.append(Grupo(id, anio, turno, carrera, particion, bool(recurse), bool(aux)))
+    grupos.append(Grupo(id, anio, turno, carrera, particion, bool(recurse)))
 
 # crear profesor
 def add_profesor(profesores, id, nombre, min_max_dias=None, nombre_completo=None):
@@ -71,55 +77,6 @@ def lista_grupos(grupos, nombres):
 
 #prioridades
 
-"""
-Generates a fixed priority array for the given time blocks with the specified priority value.
-Args:
-    bloques_horario (list): A list of time blocks.
-    value (int): The fixed priority value to be assigned to each time block.
-Returns:
-    list: A list of lists where each inner list contains a time block and the specified priority value.
-"""
-
-
-def update_no_disp(profesor, bloques_horario, no_disp_index):
-    for i in no_disp_index:
-        if bloques_horario[i] not in profesor.no_disponible:
-            profesor.no_disponible.append(bloques_horario[i])
-"""
-Updates the 'no_disponible' list of a professor by adding the specified time blocks.
-Args:
-    profesor (Profesor): The professor whose availability is being updated.
-    bloques_horario (list): A list of time blocks.
-    no_disp_index (list): A list of indices indicating which time blocks the professor is not available for.
-"""
-
-
-def update_prioridad(profesor, bloques_horario, array_prioridad):
-
-    if profesor is None: return
-    
-    # reset:
-    profesor.prioridades = []
-    profesor.no_disponible = []
-
-    """
-    Updates the priority list of a professor based on the given priority array.
-    Args:
-        profesor (Profesor): The professor whose priorities are being updated.
-        bloques_horario (list): A list of time blocks.
-        array_prioridad (list): A list of tuples where each tuple contains a time block index and a priority value.
-    """
-    # array_prioridad[i] = [(d,h),a]
-    for i in array_prioridad:
-        b_id = i[0]
-        value = i[1]
-    
-        if value == 0:
-            update_no_disp(profesor, bloques_horario, [b_id])
-        
-        prior = Prioridad(value, bloques_horario[b_id], profesor = profesor)
-        if not (prior in profesor.prioridades):
-            profesor.prioridades.append(prior)
 
 def random_pr(bloques_horario):
     pr_array = []
@@ -217,3 +174,66 @@ def copy_variables_excel(u_dict, w_dict, output):
         pd.DataFrame(data_w).to_excel(writer, sheet_name="w", index=False)
 
     
+
+#buscar materias
+"""
+This module provides functions to filter and group subjects (materias) based on professors and groups.
+Functions:
+    materias_profesor(profesor, materias_total):
+        Filters and returns a list of subjects taught by a specific professor.
+    agrupar_materias(lista_materias):
+        Groups subjects by their string representation and returns a dictionary where keys are subject names and values are lists of subjects.
+    materias_grupo(grupo, materias_total):
+        Filters and returns a list of subjects that belong to a specific group.
+    materias_grupo_ids(grupo, materias_total):
+        Filters and returns a list of subject IDs that belong to a specific group.
+"""
+
+def materias_profesor(profesor, materias_total):
+    mats = []
+
+    for m in materias_total:
+        if profesor in m.profesores:
+            mats.append(m)
+
+    return mats
+
+def agrupar_materias(lista_materias):
+    lista_nombres = {}
+
+    for m in lista_materias:
+        if str(m) not in lista_nombres:
+            lista_nombres[str(m)] = [m]
+        else:
+            lista_nombres[str(m)].append(m)
+
+    return lista_nombres
+
+def materias_grupo(grupo, materias_total):
+    materias = []
+
+    for m in materias_total:
+        if grupo is not None and grupo in m.grupos:
+            materias.append(m)
+            
+    return materias
+
+def materias_grupo_ids(grupo, materias_total):
+    materias_ids = []
+
+    for m in materias_grupo(grupo, materias_total):
+        if grupo is not None and grupo in m.grupos:
+            materias_ids.append(m.id)
+            
+    return materias_ids
+
+def electivas(materias):
+    return [m for m in materias if m.electiva]
+
+def bloques_horario_materia(materia, bloques_horario):
+    ret = []
+    for b_id in bloques_horario:
+        if set(materia.turnos()).issubset(set(bloques_horario[b_id].horario.turnos)):
+            ret.append(b_id)
+    return ret
+

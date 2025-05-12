@@ -32,7 +32,7 @@ class Grupo:
         self.anio = anio
         self.turno = turno
         self.carrera = carrera
-        self.particion = particion
+        self.particion = particion  
         self.recurse = recurse
 
     def __str__(self) -> str:
@@ -83,6 +83,46 @@ class Profesor:
         for i in self.lista_materias:
             ms.append(i["nombre_materia"])
         return ms
+    
+    def set_prioridades(self, bloques_horario, array_prioridad):
+        # reset:
+        self.prioridades = []
+        self.no_disponible = []
+        """
+        Updates the priority list of a professor based on the given priority array.
+        Args:
+            profesor (Profesor): The professor whose priorities are being updated.
+            bloques_horario (list): A list of time blocks.
+            array_prioridad (list): A list of tuples where each tuple contains a time block index and a priority value.
+        """
+        # array_prioridad[i] = [(d,h),a]
+        b_no_disp = []
+
+        for i in array_prioridad:
+            b_id = i[0]
+            value = i[1]
+        
+            if value == 0:
+                b_no_disp.append(b_id)
+            
+            prior = Prioridad(value, bloques_horario[b_id], profesor = self)
+            
+            if not (prior in self.prioridades):
+                self.prioridades.append(prior)
+
+        self.set_no_disponible(bloques_horario, b_no_disp)
+
+    def set_no_disponible(self, bloques_horario, no_disp_index):
+        for i in no_disp_index:
+            if bloques_horario[i] not in self.no_disponible:
+                self.no_disponible.append(bloques_horario[i])
+        """
+        Updates the 'no_disponible' list of a professor by adding the specified time blocks.
+        Args:
+            profesor (Profesor): The professor whose availability is being updated.
+            bloques_horario (list): A list of time blocks.
+            no_disp_index (list): A list of indices indicating which time blocks the professor is not available for.
+        """
 
 class Materia:
     def __init__(self,

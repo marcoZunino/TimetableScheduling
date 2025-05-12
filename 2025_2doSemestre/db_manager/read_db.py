@@ -15,8 +15,47 @@ def read_materias(connection):
 # leer grupos
 
 # leer profesores
+def read_profesores(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT nombre, nombre_completo, min_max_dias FROM profesores")
+    rows = cursor.fetchall()
+    profesores = []
+    for row in rows:
+        nombre = row[0]
+        cursor.execute(f"""
+                    SELECT b.dia, b.hora_inicio, p.valor
+                    FROM prioridades p, profesores prof, bloques_horarios b
+                    WHERE p.profesor = prof.cedula
+                    AND prof.nombre = '{nombre}'
+                    AND p.bloque_horario = b.id
+                    """)
+        prioridades = cursor.fetchall()
+        profesores.append([r for r in row] + [prioridades])
+    return profesores
 
 # leer horarios
+def read_horarios(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM horarios")
+
+    rows = cursor.fetchall()
+
+    horarios = []
+
+    for inicio, fin in rows:
+        cursor.execute(f"""
+                    SELECT t.turno
+                    FROM turnos_horarios t
+                    WHERE t.hora_inicio = '{inicio}'
+                    AND t.hora_fin = '{fin}'
+                    """)
+        turnos = cursor.fetchall()
+        turnos = [t[0] for t in turnos]
+        horarios.append((inicio, fin, turnos))
+
+    cursor.close()
+
+    return horarios
 
 def read_turnos(connection):
     cursor = connection.cursor()

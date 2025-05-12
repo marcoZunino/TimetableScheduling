@@ -1,6 +1,7 @@
 import psycopg2
 
 
+
 db_params = {
     'dbname': 'horarios',
     'user': 'postgres',
@@ -17,10 +18,10 @@ def get_database_connection():
     connection = None
 
     try:
-        print("Connecting to the database...")
+        # print("Connecting to the database...")
         connection = psycopg2.connect(**db_params)
         connection.set_client_encoding('UTF8')
-        print("Database connection successful.")
+        # print("Database connection successful.")
         return connection
     except psycopg2.Error as e:
         print(f"Error connecting to the database: {e}")
