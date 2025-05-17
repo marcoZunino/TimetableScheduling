@@ -1,10 +1,11 @@
 from entities import BloqueHorario, Dia, Materia, Profesor, Grupo
+import gurobipy as gp
 
 class u:
     def __init__(self, materia: Materia, horario: BloqueHorario) -> None:
         self.materia = materia
         self.horario = horario
-        self.variable = None
+        self.variable: gp.Var  = None
 
     def __str__(self) -> str:
         return "u_{" + str(self.materia) + "_" + str(self.horario) + "}"

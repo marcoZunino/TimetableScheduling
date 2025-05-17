@@ -2,6 +2,7 @@ import psycopg2
 
 
 
+
 db_params = {
     'dbname': 'horarios',
     'user': 'postgres',
@@ -10,7 +11,7 @@ db_params = {
     'port': '5434'
 }
 
-def get_database_connection():
+def get_database_connection() -> psycopg2.extensions.connection:
     """
     Establishes a database connection using the DATABASE_CONFIG dictionary.
     Returns a connection object if successful, otherwise raises an exception.

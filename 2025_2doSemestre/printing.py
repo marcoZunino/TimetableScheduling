@@ -1,4 +1,5 @@
 from entities import *
+from variables import *
 
 #imprimir
 def print_timetable(dias, horarios, u_dict, w_dict, grupos, anios):
@@ -74,7 +75,7 @@ def intersection(array1, array2):
             ret.append(i)
     return ret
 
-def print_prioridades(dias, horarios, profesores):
+def print_prioridades(dias: list[Dia], horarios: list[Horario], profesores: list[Profesor]):
     for p in profesores:
         print('\n', "Profesor:", str(p), p.nombre_completo)
         print('\t', *[str(d) for d in dias], sep='\t')
@@ -84,7 +85,7 @@ def print_prioridades(dias, horarios, profesores):
             print(str(h), *prioridades, sep='\t')
 
 
-def search_materia(b, g, u_dict):
+def search_materia(b, g, u_dict: dict[tuple, u]) -> list[Materia]:
     """
     Searches for a 'materia' object in the given dictionary of 'u' objects that matches the specified criteria.
 
@@ -104,7 +105,7 @@ def search_materia(b, g, u_dict):
             ms.append(u_obj.materia)
     return ms
 
-def search_profesor(materia, w_dict):
+def search_profesor(materia: Materia, w_dict: dict[tuple, w]) -> list[Profesor]:
     """
     Searches for professors assigned to a given subject based on a weight dictionary.
     Args:
@@ -124,20 +125,20 @@ def search_profesor(materia, w_dict):
             ps.append(p)
     return ps
 
-def search_profesor_by_nombre(profesores, nombre):
+def search_profesor_by_nombre(profesores: list[Profesor], nombre) -> Profesor:
     for p in profesores:
         if p.nombre == nombre:
             return p
     return None
 
-def search_materias_by_nombre(materias, nombre):
+def search_materias_by_nombre(materias: list[Materia], nombre) -> list[Materia]:
     ret = []
     for m in materias:
         if m.nombre == nombre:
             ret.append(m)
     return ret
     
-def search_materia_prof(b, p, u_dict, w_dict, materias):
+def search_materia_prof(b: BloqueHorario, p: Profesor, u_dict: dict[tuple, u], w_dict: dict[tuple, w], materias: list[Materia]) -> Materia:
     """
     Searches for a 'materia' (subject) that matches the given block and professor.
     Args:
@@ -150,7 +151,7 @@ def search_materia_prof(b, p, u_dict, w_dict, materias):
         The 'materia' object that matches the given block and professor, or None if no match is found.
     """
     for m in materias:
-        if round(w_dict[m.id, p.id].variable.x * u_dict[m.id, b.id()].variable.x) == 1:
+        if round(w_dict[m.id, p.id].variable.x * u_dict[m.id, b.id].variable.x) == 1:
             return m
     #     ps = search_profesor(u_obj.materia, w_dict)
     #     if bloque == b and p in ps and round(u_obj.variable.x) == 1:
@@ -164,14 +165,14 @@ def search_materia_prof(b, p, u_dict, w_dict, materias):
     #         return u_obj.materia
     return None
 
-def search_prioridad(b, p):
+def search_prioridad(b: BloqueHorario, p: Profesor):
     if b in p.no_disponible:
         return "-"
     for pr in p.prioridades:
         if pr.bloque_horario == b:
             return pr.value
         
-def grupos_anio(grupos, anio):
+def grupos_anio(grupos: list[Grupo], anio) -> list[Grupo]:
     """
     Filters a list of groups by a specific year.
 
@@ -188,7 +189,7 @@ def grupos_anio(grupos, anio):
             gs.append(g)
     return gs
 
-def horarios_turno(horarios, turno):
+def horarios_turno(horarios: list[Horario], turno) -> list[Horario]:
     """
     Filters a list of schedule objects based on a specified shift.
 
@@ -205,12 +206,8 @@ def horarios_turno(horarios, turno):
             hs.append(h)
     return hs
 
-def horarios_ids_turno(horarios, turno):
-    hs = []
-    for h in horarios:
-        if turno in h.turnos:
-            hs.append(h.id)
-    return hs
+def horarios_ids_turno(horarios: list[Horario], turno):
+    return [h.id for h in horarios_turno(horarios, turno)]
 
 
 ###########################################################################

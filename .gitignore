@@ -16,3 +16,7 @@
 2025_2doSemestre/db_manager/__pycache__/write_solution_db.cpython-312.pyc
 2025_2doSemestre/__pycache__/variables.cpython-312.pyc
 2025_2doSemestre/db_manager/__pycache__/write_db.cpython-312.pyc
+2025_2doSemestre/timetable_opt.lp
+2025_2doSemestre/iismodel.ilp
+2025_2doSemestre/timetable_opt.mps
+2025_2doSemestre/output.xlsx

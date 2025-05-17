@@ -1,26 +1,27 @@
 from .db_config import *
-from ..entities import *
+from entities import Profesor, Materia
 
 
-class Asignatura:
-    def __init__(self, codigo, nombre, nombre_completo, carga_horaria: int, cantidad_dias: int):
-        self.codigo = codigo
-        self.nombre = nombre
-        self.nombre_completo = nombre_completo
-        self.carga_horaria = carga_horaria
-        self.cantidad_dias = cantidad_dias
 
-
-def write_profesores(connection, profesores: list[Profesor]):
+def write_profesores(connection: psycopg2.extensions.connection, profesores: list[Profesor]):
     """
     Write professors to the database.
     """
     cursor = connection.cursor()
 
     for profesor in profesores:
+        
+        min_max = 'NULL'
+        match profesor.min_max_dias:
+            case "min":
+                min_max = True
+            case "max":
+                min_max = False
+
         cursor.execute(f"""
                     INSERT INTO profesores (nombre, nombre_completo, min_max_dias)
-                    VALUES ('{profesor.nombre}', '{profesor.nombre_completo}', {profesor.min_max_dias if profesor.min_max_dias else 'NULL'})
+                    VALUES ('{profesor.nombre}', '{profesor.nombre_completo}', {min_max})
+                    ON CONFLICT (nombre) DO NOTHING
                     """)
         connection.commit()
 
@@ -33,21 +34,70 @@ def write_profesores(connection, profesores: list[Profesor]):
 
     cursor.close()
 
-def write_materias(connection, asignaturas: list[Asignatura]):
+
+# class Asignatura:
+#     def __init__(self, nombre, nombre_completo, carga_horaria: int, cantidad_dias: int):
+#         # self.codigo = codigo
+#         self.nombre = nombre
+#         self.nombre_completo = nombre_completo
+#         self.carga_horaria = carga_horaria
+#         self.cantidad_dias = cantidad_dias
+
+
+def write_materias(connection: psycopg2.extensions.connection, materias: list[Materia], profesores: list[Profesor]):
+
     """
     Write subjects to the database.
     """
     cursor = connection.cursor()
 
-    for materia in asignaturas:
-        cursor.execute(f"""
-                    INSERT INTO materias (codigo, nombre, nombre_completo, cantidad_dias, carga_horaria)
-                    VALUES ('{materia.codigo}', '{materia.nombre}', '{materia.nombre_completo}', {materia.carga_horaria}, {materia.cantidad_dias})
+    materias_rows = []
+
+    for profesor in profesores:
+        
+        for mat in profesor.lista_materias:
+
+            nombre = mat["nombre_materia"]
+            materia_obj = [m for m in materias if m.nombre == nombre][0]
+            nombre_completo = materia_obj.nombre_completo
+            cant_grupos = mat["grupos_max"]
+
+
+            if nombre not in materias_rows:
+                materias_rows.append(nombre)
+                cursor.execute(f"""
+                    INSERT INTO materias (nombre, nombre_completo)
+                    VALUES ('{nombre}', '{nombre_completo}')
+                    ON CONFLICT (nombre) DO NOTHING
                     """)
-        connection.commit()
+                connection.commit()
+
+            for t in materia_obj.turnos():
+                cursor.execute(f"""
+                    INSERT INTO puede_dictar (profesor, materia, turno, grupos_max)
+                    VALUES ('{profesor.nombre}', '{nombre}', '{t}', {cant_grupos})
+                    ON CONFLICT (profesor, materia, turno) DO NOTHING
+                    """)
+                connection.commit()
+            
+
+
+            
+
+
+    # asignaturas: list[Asignatura] = []
+
+
+
+
+    # for materia in asignaturas:
+    #     cursor.execute(f"""
+    #                 INSERT INTO materias (nombre, nombre_completo, cantidad_dias, carga_horaria)
+    #                 VALUES ('{materia.nombre}', '{materia.nombre_completo}', {materia.carga_horaria}, {materia.cantidad_dias})
+    #                 """)
+    #     connection.commit()
 
     cursor.close()
-
 
 
 

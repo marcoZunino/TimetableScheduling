@@ -11,13 +11,24 @@ class Dia:
     
     def __eq__(self, __value: object) -> bool:
         return type(__value) == type(self) and self.nombre == __value.nombre
+    
+# class Turno:
+#     def __init__(self, nombre: str):
+#         self.nombre = nombre
+
+#     def __str__(self) -> str:
+#         return self.nombre
+    
+#     def __eq__(self, __value: object) -> bool:
+#         return type(__value) == type(self) and self.nombre == __value.nombre
  
 class Horario:
-    def __init__(self, id: int, inicio: str, fin: str, turnos=[]):
+    def __init__(self, id: int, inicio: str, fin: str, turnos: list[str] = [], turnos_excepcional: list[str] = []) -> None:
         self.id = id
         self.inicio = str(inicio)
         self.fin = str(fin)
-        self.turnos = turnos # [str]
+        self.turnos = turnos
+        self.turnos_excepcional = turnos_excepcional
 
     def __str__(self) -> str:
         return self.inicio + "-" + self.fin
@@ -59,18 +70,21 @@ class BloqueHorario:
     def __eq__(self, __value: object) -> bool:
         return type(__value) == type(self) and self.dia == __value.dia and self.horario == __value.horario
     
+    @property
     def id(self):
         return (self.dia.id, self.horario.id)
 
 class Profesor:
-    def __init__(self, id: int, nombre: str, min_max_dias: str = None, nombre_completo: str = None) -> None:
+    def __init__(self, id: int, nombre: str, min_max_dias: str = None, nombre_completo: str = None, cedula: str = None, mail: str = None) -> None:
         self.id = id
         self.nombre = nombre
         self.nombre_completo = nombre_completo
-        self.no_disponible = []
-        self.prioridades = []
+        self.no_disponible: list[Prioridad] = []
+        self.prioridades: list[Prioridad] = []
         self.lista_materias = [] # lista_materias[i] = (nombre_materia: str, grupos_max: int)
         self.min_max_dias = min_max_dias
+        self.cedula = cedula
+        self.mail = mail
 
     def __str__(self) -> str:
         return self.nombre
@@ -128,16 +142,18 @@ class Materia:
     def __init__(self,
                  id: int,
                  nombre: str,
+                 nombre_completo: str,
                  carga_horaria: int=None,
                  cantidad_dias: int=3,
-                 grupos = [],
-                 profesores = [],
+                 grupos: list[Grupo] = [],
+                 profesores: list[Profesor] = [],
                  cantidad_profesores = 1,
                  electiva = False,
                  teo_prac = None
                  ) -> None:
 
         self.nombre = nombre
+        self.nombre_completo = nombre_completo
         self.id = id
         self.carga_horaria = carga_horaria  #C_m
         self.cantidad_dias = cantidad_dias  #D_m
@@ -173,12 +189,9 @@ class Materia:
             return 0
         return math.floor(self.carga_horaria / self.cantidad_dias)
     
-    def turnos(self):
-        turnos = []
-        for g in self.grupos:
-            if g.turno is not None and g.turno not in turnos:
-                turnos.append(g.turno)
-        return turnos
+    def turnos(self) -> list[str]:
+        return list(set([g.turno for g in self.grupos if g.turno != None]))
+    
     
     def anios(self):
         anios = []
@@ -208,26 +221,21 @@ class Prioridad:
         # if (not self.materia is None):
         #     return type(__value) == type(self) and self.materia == __value.materia and self.bloque_horario == __value.bloque_horario
         
-    
+    @property
     def id(self):
-        if (self.profesor != None):
-            return (self.profesor.id, self.bloque_horario.id())
-        # if (not self.materia is None):
-        #     return (self.materia.id, self.bloque_horario.id())
+        return (self.profesor.id, self.bloque_horario.id)
         
     
 class Superposicion:
     def __init__(self, value: int, materia1: Materia, materia2: Materia) -> None:
         self.value = value
-        self.materia1 = materia1
-        self.materia2 = materia2
+        self.materia1: Materia = materia1
+        self.materia2: Materia = materia2
     
     def __str__(self) -> str:
         return "s_" + str(self.materia1) + "," + str(self.materia2) + "=" + str(self.value)
     
     def __eq__(self, __value: object) -> bool:
         return type(__value) == type(self) and ((self.materia1 == __value.materia1 and self.materia2 == __value.materia2) or (self.materia1 == __value.materia2 and self.materia2 == __value.materia1))
-    
-    def id(self):
-        return (self.profesor.id, self.bloque_horario.id())
+
 

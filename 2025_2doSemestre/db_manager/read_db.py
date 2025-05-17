@@ -34,7 +34,7 @@ def read_profesores(connection):
     return profesores
 
 # leer horarios
-def read_horarios(connection):
+def read_horarios(connection: psycopg2.extensions.connection):
     cursor = connection.cursor()
     cursor.execute("SELECT * FROM horarios")
 
@@ -44,14 +44,16 @@ def read_horarios(connection):
 
     for inicio, fin in rows:
         cursor.execute(f"""
-                    SELECT t.turno
+                    SELECT t.turno, t.excepcional
                     FROM turnos_horarios t
                     WHERE t.hora_inicio = '{inicio}'
                     AND t.hora_fin = '{fin}'
                     """)
-        turnos = cursor.fetchall()
-        turnos = [t[0] for t in turnos]
-        horarios.append((inicio, fin, turnos))
+        data = cursor.fetchall()
+        turnos = [t[0] for t in data]
+        turnos_excepcional = [t[0] for t in data if t[1]]
+
+        horarios.append((inicio, fin, turnos, turnos_excepcional))
 
     cursor.close()
 
