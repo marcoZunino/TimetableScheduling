@@ -1,6 +1,5 @@
 import psycopg2
-
-
+import json
 
 
 db_params = {
@@ -10,6 +9,13 @@ db_params = {
     'host': 'localhost',
     'port': '5434'
 }
+
+try:
+    with open("db_manager\\db_params.json", "r") as file:
+        db_params = json.load(file)
+except FileNotFoundError:
+    print("db_params.json file not found. Using default parameters.")
+
 
 def get_database_connection() -> psycopg2.extensions.connection:
     """
@@ -23,6 +29,7 @@ def get_database_connection() -> psycopg2.extensions.connection:
         connection = psycopg2.connect(**db_params)
         connection.set_client_encoding('UTF8')
         # print("Database connection successful.")
+        
         return connection
     except psycopg2.Error as e:
         print(f"Error connecting to the database: {e}")

@@ -35,8 +35,10 @@ def print_timetable(dias, horarios, u_dict, w_dict, grupos, anios):
                         # lista.append([str(m) + " " + str(*[str(p) for p in search_profesor(m, w_dict)]) for m in ms])
                         # lista.append("/".join(map(str, [str(m) + " " + str(*[str(p) for p in search_profesor(m, w_dict)]) for m in ms])))
                         lista.append("/".join(map(str, ms)))
-                        
-                print(str(h), *lista, sep='\t\t')
+                h_print = str(h)
+                if g.turno in h.turnos_excepcional:
+                    h_print += " *"
+                print(h_print, *lista, sep='\t\t')
 
 def print_prof_timetable(dias, horarios, u_dict, w_dict, profesores, materias):
     """
