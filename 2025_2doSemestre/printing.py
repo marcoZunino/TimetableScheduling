@@ -244,7 +244,10 @@ def print_timetable_excel(dias, horarios, u_dict, w_dict, grupos, anios, show_pr
                         # lista.append("/".join(map(str, ms)))
                         
                 # print(str(h), *lista, sep='\t\t')
-                print(str(h), *lista, sep='\t')
+                h_print = str(h)
+                if g.turno in h.turnos_excepcional:
+                    h_print += " *"
+                print(h_print, *lista, sep='\t')
 
 
 def print_prof_timetable_excel(dias, horarios, u_dict, w_dict, profesores, materias):

@@ -1,6 +1,6 @@
 -- script para definir la base de datos en PostgreSQL
 
--- actualizado al 16/05/2025
+-- actualizado al 23/05/2025
 
 CREATE DATABASE horarios;
 
@@ -8,7 +8,8 @@ CREATE DATABASE horarios;
 
 CREATE TABLE personas (
     cedula VARCHAR PRIMARY KEY,
-    mail VARCHAR UNIQUE
+    mail VARCHAR UNIQUE,
+    nombre VARCHAR UNIQUE
 );
 
 CREATE TABLE profesores (
@@ -125,7 +126,6 @@ INSERT INTO turnos_horarios (hora_inicio, hora_fin, turno) VALUES
 ('12:30', '13:20', 'mañana'),
 ('14:10', '15:00', 'tarde1'),
 ('15:10', '16:00', 'tarde1'),
-('15:10', '16:00', 'tarde2'),
 ('16:10', '17:00', 'tarde1'),
 ('16:10', '17:00', 'tarde2'),
 ('17:00', '17:50', 'tarde1'),
@@ -137,15 +137,17 @@ INSERT INTO turnos_horarios (hora_inicio, hora_fin, turno) VALUES
 ('18:50', '19:40', 'tarde2'),
 ('18:50', '19:40', 'noche'),
 ('19:50', '20:40', 'noche'),
+('19:50', '20:40', 'tarde2'),
 ('20:40', '21:30', 'noche'),
+('20:40', '21:30', 'tarde2'),
 ('21:40', '22:30', 'noche');
 
 -- horarios excepcionales
 INSERT INTO turnos_horarios (hora_inicio, hora_fin, turno, excepcional) VALUES
 ('13:20', '14:10', 'mañana', TRUE),
-('14:10', '15:00', 'tarde2', TRUE),
+('15:10', '16:00', 'tarde2', TRUE),
 ('17:00', '17:50', 'noche', TRUE),
-('19:50', '20:40', 'tarde2', TRUE);
+('21:40', '22:30', 'tarde2', TRUE);
 
 
 

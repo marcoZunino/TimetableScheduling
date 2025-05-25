@@ -18,10 +18,16 @@ def write_profesores(connection: psycopg2.extensions.connection, profesores: lis
             case "max":
                 min_max = False
 
+        cedula = profesor.cedula if profesor.cedula else 'NULL'
+
         cursor.execute(f"""
-                    INSERT INTO profesores (nombre, nombre_completo, min_max_dias)
-                    VALUES ('{profesor.nombre}', '{profesor.nombre_completo}', {min_max})
-                    ON CONFLICT (nombre) DO NOTHING
+                    INSERT INTO profesores (nombre, nombre_completo, min_max_dias, cedula)
+                    VALUES ('{profesor.nombre}', '{profesor.nombre_completo}', {min_max}, {cedula})
+                    ON CONFLICT (nombre)
+                        DO UPDATE SET
+                            nombre_completo = EXCLUDED.nombre_completo,
+                            min_max_dias = EXCLUDED.min_max_dias,
+                            cedula = EXCLUDED.cedula;
                     """)
         connection.commit()
 
@@ -79,12 +85,6 @@ def write_materias(connection: psycopg2.extensions.connection, materias: list[Ma
                     ON CONFLICT (profesor, materia, turno) DO NOTHING
                     """)
                 connection.commit()
-            
-
-
-            
-
-
     # asignaturas: list[Asignatura] = []
 
 
@@ -96,6 +96,35 @@ def write_materias(connection: psycopg2.extensions.connection, materias: list[Ma
     #                 VALUES ('{materia.nombre}', '{materia.nombre_completo}', {materia.carga_horaria}, {materia.cantidad_dias})
     #                 """)
     #     connection.commit()
+
+    cursor.close()
+
+def write_prioridades(connection: psycopg2.extensions.connection, profesor: Profesor):
+    """
+    Write priorities to the database.
+    """
+    cursor = connection.cursor()
+
+    for prioridad in profesor.prioridades:
+        
+        dia = prioridad.bloque_horario.dia
+        hora_inicio = prioridad.bloque_horario.horario.inicio
+
+        cursor.execute(f"""
+                    INSERT INTO prioridades (profesor, bloque_horario, valor)
+                    SELECT '{profesor.nombre}', b.id, {prioridad.value}
+                    FROM bloques_horarios b
+                    WHERE '{dia}' = b.dia AND '{hora_inicio}' = b.hora_inicio
+                    ON CONFLICT (profesor, bloque_horario) 
+                        DO UPDATE SET valor = EXCLUDED.valor;
+                    """)
+        connection.commit()
+
+        cursor.execute(f"""
+                    UPDATE profesores
+                    SET ultima_modificacion = NOW()::timestamp WITHOUT TIME ZONE
+                    WHERE nombre = '{profesor.nombre}'
+                    """)
 
     cursor.close()
 

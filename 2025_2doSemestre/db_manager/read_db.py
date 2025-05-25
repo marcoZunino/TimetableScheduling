@@ -33,6 +33,35 @@ def read_profesores(connection):
         profesores.append([r for r in row] + [prioridades])
     return profesores
 
+def read_prioridades(connection, profesor):
+    #  -> list[dia.nombre, hora_inicio, valor]
+    
+    cursor = connection.cursor()
+    cursor.execute(f"""
+                SELECT b.dia, b.hora_inicio, p.valor
+                FROM prioridades p, bloques_horarios b
+                WHERE p.profesor = '{profesor}'
+                AND p.bloque_horario = b.id
+                """)
+    prioridades = cursor.fetchall()
+    cursor.close()
+    return prioridades
+
+def read_last_update(connection, profesor):
+    cursor = connection.cursor()
+    cursor.execute(f"""
+                SELECT ultima_modificacion::timestamp 
+                   AT TIME ZONE 'UTC' 
+                   AT TIME ZONE 'America/Montevideo'
+                FROM profesores
+                WHERE nombre = '{profesor}'
+                """)
+    last_update = cursor.fetchone()
+    cursor.close()
+    return last_update[0] if last_update else None
+
+
+
 # leer horarios
 def read_horarios(connection: psycopg2.extensions.connection):
     cursor = connection.cursor()
@@ -66,10 +95,6 @@ def read_turnos(connection):
     cursor.close()
     return [row[0] for row in rows]
 
-
-def retrieve_all_data():
-    connection = get_database_connection()
-    # print(read_turnos(connection))
 
 
 def write_prioridades_excel(dias, horarios, profesores):

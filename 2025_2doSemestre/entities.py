@@ -85,6 +85,7 @@ class Profesor:
         self.min_max_dias = min_max_dias
         self.cedula = cedula
         self.mail = mail
+        self.last_update = None
 
     def __str__(self) -> str:
         return self.nombre
@@ -123,6 +124,10 @@ class Profesor:
             
             if not (prior in self.prioridades):
                 self.prioridades.append(prior)
+
+        for b_id in bloques_horario:
+            if b_id not in [i[0] for i in array_prioridad]:
+                self.no_disponible.append(bloques_horario[b_id])
 
         self.set_no_disponible(bloques_horario, b_no_disp)
 
