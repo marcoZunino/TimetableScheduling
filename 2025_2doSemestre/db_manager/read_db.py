@@ -52,13 +52,18 @@ def read_last_update(connection, profesor):
     cursor.execute(f"""
                 SELECT ultima_modificacion::timestamp 
                    AT TIME ZONE 'UTC' 
-                   AT TIME ZONE 'America/Montevideo'
+                   AT TIME ZONE 'America/Montevideo',
+                   min_max_dias
                 FROM profesores
                 WHERE nombre = '{profesor}'
                 """)
-    last_update = cursor.fetchone()
+    row = cursor.fetchone()
     cursor.close()
-    return last_update[0] if last_update else None
+
+    last_update = row[0]
+    min_max_dias = "min" if row[1] else None
+
+    return last_update, min_max_dias
 
 
 

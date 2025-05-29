@@ -41,14 +41,6 @@ def write_profesores(connection: psycopg2.extensions.connection, profesores: lis
     cursor.close()
 
 
-# class Asignatura:
-#     def __init__(self, nombre, nombre_completo, carga_horaria: int, cantidad_dias: int):
-#         # self.codigo = codigo
-#         self.nombre = nombre
-#         self.nombre_completo = nombre_completo
-#         self.carga_horaria = carga_horaria
-#         self.cantidad_dias = cantidad_dias
-
 
 def write_materias(connection: psycopg2.extensions.connection, materias: list[Materia], profesores: list[Profesor]):
 
@@ -60,6 +52,22 @@ def write_materias(connection: psycopg2.extensions.connection, materias: list[Ma
     materias_rows = []
 
     for profesor in profesores:
+
+        cursor.execute(f"""       
+                SELECT materia, turno
+                FROM puede_dictar
+                WHERE profesor = '{profesor.nombre}'
+                """)
+        materias_registradas = cursor.fetchall()
+
+        for mat, turno in materias_registradas:
+            if mat not in [i["nombre_materia"] for i in profesor.lista_materias] or turno not in [m.turnos() for m in materias if m.nombre == mat][0]:
+                cursor.execute(f"""
+                    DELETE FROM puede_dictar
+                    WHERE profesor = '{profesor.nombre}' AND materia = '{mat}' AND turno = '{turno}'
+                    """)
+                connection.commit()
+
         
         for mat in profesor.lista_materias:
 
@@ -68,13 +76,14 @@ def write_materias(connection: psycopg2.extensions.connection, materias: list[Ma
             nombre_completo = materia_obj.nombre_completo
             cant_grupos = mat["grupos_max"]
 
-
             if nombre not in materias_rows:
                 materias_rows.append(nombre)
                 cursor.execute(f"""
                     INSERT INTO materias (nombre, nombre_completo)
                     VALUES ('{nombre}', '{nombre_completo}')
-                    ON CONFLICT (nombre) DO NOTHING
+                    ON CONFLICT (nombre)
+                        DO UPDATE SET
+                            nombre_completo = EXCLUDED.nombre_completo
                     """)
                 connection.commit()
 
@@ -82,21 +91,12 @@ def write_materias(connection: psycopg2.extensions.connection, materias: list[Ma
                 cursor.execute(f"""
                     INSERT INTO puede_dictar (profesor, materia, turno, grupos_max)
                     VALUES ('{profesor.nombre}', '{nombre}', '{t}', {cant_grupos})
-                    ON CONFLICT (profesor, materia, turno) DO NOTHING
+                    ON CONFLICT (profesor, materia, turno)
+                        DO UPDATE SET
+                            grupos_max = EXCLUDED.grupos_max
                     """)
                 connection.commit()
-    # asignaturas: list[Asignatura] = []
-
-
-
-
-    # for materia in asignaturas:
-    #     cursor.execute(f"""
-    #                 INSERT INTO materias (nombre, nombre_completo, cantidad_dias, carga_horaria)
-    #                 VALUES ('{materia.nombre}', '{materia.nombre_completo}', {materia.carga_horaria}, {materia.cantidad_dias})
-    #                 """)
-    #     connection.commit()
-
+    
     cursor.close()
 
 def write_prioridades(connection: psycopg2.extensions.connection, profesor: Profesor):
